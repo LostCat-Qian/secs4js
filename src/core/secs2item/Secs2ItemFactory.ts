@@ -38,7 +38,7 @@ export function createU4Item(...value: number[]): Secs2ItemNumeric {
 	return new Secs2ItemNumeric(SecsItemType.U4, value);
 }
 
-export function createU8Item(...value: number[]): Secs2ItemNumeric {
+export function createU8Item(...value: number[] | bigint[]): Secs2ItemNumeric {
 	return new Secs2ItemNumeric(SecsItemType.U8, value);
 }
 
@@ -50,7 +50,7 @@ export function createI4Item(...value: number[]): Secs2ItemNumeric {
 	return new Secs2ItemNumeric(SecsItemType.I4, value);
 }
 
-export function createI8Item(...value: number[]): Secs2ItemNumeric {
+export function createI8Item(...value: number[] | bigint[]): Secs2ItemNumeric {
 	return new Secs2ItemNumeric(SecsItemType.I8, value);
 }
 
@@ -58,6 +58,6 @@ export function createF4Item(...value: number[]): Secs2ItemNumeric {
 	return new Secs2ItemNumeric(SecsItemType.F4, value);
 }
 
-export function createF8Item(...value: number[]): Secs2ItemNumeric {
+export function createF8Item(...value: number[] | bigint[]): Secs2ItemNumeric {
 	return new Secs2ItemNumeric(SecsItemType.F8, value);
 }

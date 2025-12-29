@@ -1,5 +1,5 @@
 import { HsmsActiveCommunicator } from "../src/hsms/HsmsActiveCommunicator.js";
-import { SecsMessage } from "../src/index.js";
+import { A, L, SecsMessage } from "../src/index.js";
 
 async function main() {
 	// const passive = new HsmsPassiveCommunicator({
@@ -52,7 +52,15 @@ async function main() {
 	await active.untilConnected(); // Wait for Select success
 
 	active.on("message", (msg: SecsMessage) => {
-		console.log(`Active received: ${msg.toSml()}`);
+		void (async () => {
+			console.log(`Active received: ${msg.toSml()}`);
+			if (msg.stream === 1 && msg.func === 1) {
+				await active.reply(msg, 1, 2, L(A("MDLN-A"), A("SOFTREV-1")));
+			}
+			if (msg.stream === 1 && msg.func === 13) {
+				await active.reply(msg, 1, 14, L(A("ACK")));
+			}
+		})();
 	});
 
 	const reply = await active.send(1, 1, true);
