@@ -13,6 +13,9 @@ export interface HsmsPassiveCommunicatorConfig extends HsmsCommunicatorConfig {
 	timeoutRebind?: number;
 }
 
+/**
+ * @description HsmsPassiveCommunicator is the class that represents an HSMS passive communicator.
+ */
 export class HsmsPassiveCommunicator extends HsmsCommunicator {
 	private server: Server | null = null;
 	private shouldStop = false;
@@ -26,6 +29,9 @@ export class HsmsPassiveCommunicator extends HsmsCommunicator {
 		}
 	}
 
+	/**
+	 * @description Opens the passive communicator.
+	 */
 	async open(): Promise<void> {
 		if (this.serverLoopPromise) {
 			return;
@@ -48,6 +54,11 @@ export class HsmsPassiveCommunicator extends HsmsCommunicator {
 		await firstListen;
 	}
 
+	/**
+	 * @description Runs the server loop.
+	 * @param onFirstListening The callback function to be called when the first listening is completed.
+	 * @returns A Promise that resolves when the server loop is stopped.
+	 */
 	private async runServerLoop(onFirstListening: () => void): Promise<void> {
 		let first = true;
 		while (!this.shouldStop) {
@@ -69,6 +80,11 @@ export class HsmsPassiveCommunicator extends HsmsCommunicator {
 		}
 	}
 
+	/**
+	 * @description Listens for a single connection.
+	 * @param onListening The callback function to be called when the connection is established.
+	 * @returns A Promise that resolves when the connection is closed.
+	 */
 	private async listenOnce(onListening: (() => void) | null): Promise<void> {
 		return new Promise((resolve, reject) => {
 			const server = createServer((socket) => {
@@ -97,6 +113,11 @@ export class HsmsPassiveCommunicator extends HsmsCommunicator {
 		});
 	}
 
+	/**
+	 * @description Handles an incoming socket connection.
+	 * @param socket The socket object representing the incoming connection.
+	 * @returns A Promise that resolves when the socket connection is handled.
+	 */
 	private async handleIncomingSocket(socket: Socket): Promise<void> {
 		socket.setNoDelay(true);
 
@@ -109,6 +130,11 @@ export class HsmsPassiveCommunicator extends HsmsCommunicator {
 		await this.handleSocketUntilSelected(socket);
 	}
 
+	/**
+	 * @description Handles a socket connection until it is selected.
+	 * @param socket The socket object representing the connection.
+	 * @returns A Promise that resolves with a boolean indicating whether the socket was promoted to selected.
+	 */
 	private async handleSocketUntilSelected(socket: Socket): Promise<boolean> {
 		let buffer = Buffer.alloc(0);
 		let t8Timer: NodeJS.Timeout | null = null;

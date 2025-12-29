@@ -1,5 +1,13 @@
 import { AbstractSecs2Item } from "./secs2item/AbstractSecs2Item.js";
 
+/**
+ * @param stream The stream number.
+ * @param func The function number.
+ * @param wBit Whether the message is a request.
+ * @param body The body of the message.
+ * @param systemBytes The system bytes.
+ * @param deviceId The device ID.
+ */
 export class SecsMessage {
 	constructor(
 		public readonly stream: number,
@@ -14,7 +22,8 @@ export class SecsMessage {
 	}
 
 	/**
-	 * Returns the SML representation.
+	 * @description Returns the SML representation of the message.
+	 * @returns The SML representation.
 	 */
 	toSml(): string {
 		const wBitStr = this.wBit ? "W" : "";
@@ -25,6 +34,10 @@ export class SecsMessage {
 		return `${header}.`;
 	}
 
+	/**
+	 * @description Returns the binary representation of the message.
+	 * @returns The binary representation.
+	 */
 	toBuffer(): Buffer {
 		const header = Buffer.from([
 			0x02, // SML header

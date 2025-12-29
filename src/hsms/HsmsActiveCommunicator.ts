@@ -8,6 +8,9 @@ import { HsmsMessage } from "./HsmsMessage.js";
 import { RejectReason } from "./enums/RejectReason.js";
 import { SelectStatus } from "./enums/SelectStatus.js";
 
+/**
+ * @description HsmsActiveCommunicator is a class that extends HsmsCommunicator and implements the active communicator logic.
+ */
 export class HsmsActiveCommunicator extends HsmsCommunicator {
 	private shouldStop = false;
 	private reconnectTimer: NodeJS.Timeout | null = null;

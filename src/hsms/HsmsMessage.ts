@@ -4,6 +4,17 @@ import { HsmsControlType } from "./enums/HsmsControlType.js";
 import { RejectReason } from "./enums/RejectReason.js";
 import { Secs2ItemParser } from "../core/secs2item/Secs2ItemParser.js";
 
+/**
+ * @description HsmsMessage is the class that represents an HSMS message.
+ * @param stream The stream number of the message.
+ * @param func The function number of the message.
+ * @param wBit The W-Bit of the message.
+ * @param body The body of the message.
+ * @param systemBytes The system bytes of the message.
+ * @param deviceId The device ID of the message.
+ * @param pType The P-Type of the message.
+ * @param sType The S-Type of the message.
+ */
 export class HsmsMessage extends SecsMessage {
 	constructor(
 		stream: number,
@@ -19,7 +30,7 @@ export class HsmsMessage extends SecsMessage {
 	}
 
 	/**
-	 * Encodes the message to a buffer (Length + Header + Body).
+	 * @description Encodes the message to a buffer (Length + Header + Body).
 	 */
 	toBuffer(): Buffer {
 		const bodyBuffer = this.body ? this.body.toBuffer() : Buffer.alloc(0);
@@ -80,10 +91,20 @@ export class HsmsMessage extends SecsMessage {
 		return Buffer.concat([lengthBuffer, header, bodyBuffer]);
 	}
 
+	/**
+	 * @description Checks if the message is a data message.
+	 * @description data message: deviceId not 0xFF 0xFF and header[4] and header[5] are 0.
+	 * @returns True if the message is a data message, false otherwise.
+	 */
 	isDataMessage(): boolean {
 		return (this.sType as HsmsControlType) === HsmsControlType.Data;
 	}
 
+	/**
+	 * @description Creates an HsmsMessage from a buffer.
+	 * @param buffer The buffer containing the message data.
+	 * @returns The HsmsMessage object.
+	 */
 	static fromBuffer(buffer: Buffer): HsmsMessage {
 		if (buffer.length < 14) {
 			throw new Error("Buffer too short for HSMS message");
@@ -136,7 +157,11 @@ export class HsmsMessage extends SecsMessage {
 	}
 
 	// Factory methods for Control Messages
-
+	/**
+	 * @description Creates a Select Request message.
+	 * @param systemBytes The system bytes of the message.
+	 * @returns The HsmsMessage object.
+	 */
 	static selectReq(systemBytes: number): HsmsMessage {
 		return new HsmsMessage(
 			0,
@@ -150,6 +175,12 @@ export class HsmsMessage extends SecsMessage {
 		);
 	}
 
+	/**
+	 * @description Creates a Select Response message.
+	 * @param req The Select Request message.
+	 * @param status The status of the response.
+	 * @returns The HsmsMessage object.
+	 */
 	static selectRsp(req: HsmsMessage, status: number): HsmsMessage {
 		return new HsmsMessage(
 			0,
@@ -163,6 +194,11 @@ export class HsmsMessage extends SecsMessage {
 		);
 	}
 
+	/**
+	 * @description Creates a Deselect Request message.
+	 * @param systemBytes The system bytes of the message.
+	 * @returns The HsmsMessage object.
+	 */
 	static deselectReq(systemBytes: number): HsmsMessage {
 		return new HsmsMessage(
 			0,
@@ -176,6 +212,12 @@ export class HsmsMessage extends SecsMessage {
 		);
 	}
 
+	/**
+	 * @description Creates a Deselect Response message.
+	 * @param req The Deselect Request message.
+	 * @param status The status of the response.
+	 * @returns The HsmsMessage object.
+	 */
 	static deselectRsp(req: HsmsMessage, status: number): HsmsMessage {
 		return new HsmsMessage(
 			0,
@@ -189,6 +231,11 @@ export class HsmsMessage extends SecsMessage {
 		);
 	}
 
+	/**
+	 * @description Creates a Link Test Request message.
+	 * @param systemBytes The system bytes of the message.
+	 * @returns The HsmsMessage object.
+	 */
 	static linkTestReq(systemBytes: number): HsmsMessage {
 		return new HsmsMessage(
 			0,
@@ -202,6 +249,11 @@ export class HsmsMessage extends SecsMessage {
 		);
 	}
 
+	/**
+	 * @description Creates a Link Test Response message.
+	 * @param req The Link Test Request message.
+	 * @returns The HsmsMessage object.
+	 */
 	static linkTestRsp(req: HsmsMessage): HsmsMessage {
 		return new HsmsMessage(
 			0,
@@ -215,6 +267,12 @@ export class HsmsMessage extends SecsMessage {
 		);
 	}
 
+	/**
+	 * @description Creates a Reject Request message.
+	 * @param req The message that triggered the reject.
+	 * @param reason The reason for the reject.
+	 * @returns The HsmsMessage object.
+	 */
 	static rejectReq(req: HsmsMessage, reason: RejectReason): HsmsMessage {
 		// Byte 2 (Stream) should be the sType of the rejected message if PType is not supported
 		// But typically it's just mirroring or specific logic.
@@ -232,6 +290,11 @@ export class HsmsMessage extends SecsMessage {
 		);
 	}
 
+	/**
+	 * @description Creates a Separate Request message.
+	 * @param systemBytes The system bytes of the message.
+	 * @returns The HsmsMessage object.
+	 */
 	static separateReq(systemBytes: number): HsmsMessage {
 		return new HsmsMessage(
 			0,

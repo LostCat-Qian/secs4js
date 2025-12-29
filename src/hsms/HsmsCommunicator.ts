@@ -17,6 +17,12 @@ export enum HsmsState {
 	Selected = "Selected", // HSMS Selected
 }
 
+/**
+ * @description HsmsCommunicatorConfig is the configuration interface for HsmsCommunicator.
+ * @param ip The IP address of the remote device.
+ * @param port The port number of the remote device.
+ * @param linkTestInterval The interval in milliseconds to send link test messages.
+ */
 export interface HsmsCommunicatorConfig extends SecsCommunicatorConfig {
 	ip: string;
 	port: number;

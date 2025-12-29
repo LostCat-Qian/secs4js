@@ -7,28 +7,51 @@ import { Secs2ItemBinary } from "../core/secs2item/Secs2ItemBinary.js";
 import { Secs2ItemBoolean } from "../core/secs2item/Secs2ItemBoolean.js";
 import { Secs2ItemNumeric } from "../core/secs2item/Secs2ItemNumeric.js";
 
+/**
+ * @description A cursor for SML parsing.
+ */
 class SmlCursor {
 	constructor(
 		public str: string,
 		public pos = 0,
 	) {}
 
+	/**
+	 * @description Returns the next character in the string without consuming it.
+	 * @returns The next character in the string.
+	 */
 	peek(): string {
 		return this.str[this.pos];
 	}
 
+	/**
+	 * @description Consumes the next character in the string and returns it.
+	 * @returns The consumed character.
+	 */
 	consume(): string {
 		return this.str[this.pos++];
 	}
 
+	/**
+	 * @description Returns true if the cursor is at the end of the string.
+	 * @returns True if the cursor is at the end of the string.
+	 */
 	eof(): boolean {
 		return this.pos >= this.str.length;
 	}
 
+	/**
+	 * @description Skips whitespace characters in the string.
+	 */
 	skipWs() {
 		while (!this.eof() && /\s/.test(this.peek())) this.pos++;
 	}
 
+	/**
+	 * @description Matches the next character in the string with the given character.
+	 * @param char The character to match.
+	 * @returns True if the next character in the string is the given character.
+	 */
 	match(char: string): boolean {
 		if (this.peek() === char) {
 			this.consume();
@@ -38,9 +61,17 @@ class SmlCursor {
 	}
 }
 
+/**
+ * @description A parser for SECS-II SML strings.
+ */
 export class SmlParser {
 	private static readonly SML_REGEX = /^[Ss](\d+)[Ff](\d+)\s*(W?)\s*(.*)\.$/s;
 
+	/**
+	 * @description Parses an SML string into a SecsMessage.
+	 * @param sml The SML string to parse.
+	 * @returns The parsed SecsMessage.
+	 */
 	static parse(sml: string): SecsMessage {
 		const trimmed = sml.trim();
 		const match = this.SML_REGEX.exec(trimmed);
@@ -59,6 +90,11 @@ export class SmlParser {
 		return new SecsMessage(stream, func, wBit, body);
 	}
 
+	/**
+	 * @description Parses an SML body string into a Secs2Item.
+	 * @param smlBody The SML body string to parse.
+	 * @returns The parsed Secs2Item.
+	 */
 	static parseBody(smlBody: string): AbstractSecs2Item | null {
 		const trimmed = smlBody.trim();
 		if (trimmed.length === 0) {

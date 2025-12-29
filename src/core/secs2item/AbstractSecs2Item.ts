@@ -20,10 +20,18 @@ export abstract class AbstractSecs2Item<T = unknown> {
 		});
 	}
 
+	/**
+	 * @description Returns the value of the item.
+	 */
 	get value(): T {
 		return this._value;
 	}
 
+	/**
+	 * @description Returns the value of the item at the given index.
+	 * @param index The index of the value to return.
+	 * @returns The value of the item at the given index.
+	 */
 	protected getByIndex(index: number): unknown {
 		const v = this._value;
 		if (Array.isArray(v) || Buffer.isBuffer(v) || typeof v === "string") {
@@ -37,17 +45,17 @@ export abstract class AbstractSecs2Item<T = unknown> {
 	}
 
 	/**
-	 * Returns the SML representation of the item.
+	 * @description Returns the SML representation of the item.
 	 */
 	abstract toSml(): string;
 
 	/**
-	 * Returns the SECS-II encoded buffer of the item.
+	 * @description Returns the SECS-II encoded buffer of the item.
 	 */
 	abstract toBuffer(): Buffer;
 
 	/**
-	 * Helper to create the header (Type + LengthBytes)
+	 * @description Helper to create the header (Type + LengthBytes)
 	 */
 	protected createHeader(length: number): Buffer {
 		let headerByte = this.type;

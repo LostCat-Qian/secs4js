@@ -1,11 +1,6 @@
 import { SecsItemType } from "../enums/SecsItemType.js";
 import { AbstractSecs2Item } from "./AbstractSecs2Item.js";
-import {
-	createAsciiItem,
-	createBinaryItem,
-	createBooleanItem,
-	createListItem,
-} from "./Secs2ItemFactory.js";
+import { Secs2ItemFactory } from "./Secs2ItemFactory.js";
 import { Secs2ItemNumeric } from "./Secs2ItemNumeric.js";
 
 export class Secs2ItemParser {
@@ -51,7 +46,7 @@ export class Secs2ItemParser {
 				offset += result.consumed;
 			}
 
-			const item = createListItem(...items);
+			const item = Secs2ItemFactory.createListItem(...items);
 			return { item, consumed: offset };
 		}
 
@@ -71,10 +66,10 @@ export class Secs2ItemParser {
 
 		switch (itemType) {
 			case SecsItemType.A:
-				item = createAsciiItem(valueBuffer.toString("ascii"));
+				item = Secs2ItemFactory.createAsciiItem(valueBuffer.toString("ascii"));
 				break;
 			case SecsItemType.B:
-				item = createBinaryItem(valueBuffer);
+				item = Secs2ItemFactory.createBinaryItem(valueBuffer);
 				break;
 			case SecsItemType.BOOLEAN: {
 				// Parse boolean array
@@ -82,7 +77,7 @@ export class Secs2ItemParser {
 				for (const byte of valueBuffer) {
 					bools.push(byte !== 0);
 				}
-				item = createBooleanItem(...bools);
+				item = Secs2ItemFactory.createBooleanItem(...bools);
 				break;
 			}
 			case SecsItemType.I1:

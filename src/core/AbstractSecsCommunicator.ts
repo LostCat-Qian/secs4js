@@ -2,6 +2,12 @@ import { EventEmitter } from "events";
 import { SecsMessage } from "./AbstractSecsMessage.js";
 import { AbstractSecs2Item } from "./secs2item/AbstractSecs2Item.js";
 
+/**
+ * @param message The message received.
+ * @param error The error occurred.
+ * @param connected The connection is established.
+ * @param disconnected The connection is closed.
+ */
 export interface SecsCommunicatorEvents {
 	message: [SecsMessage];
 	error: [Error];
@@ -9,6 +15,19 @@ export interface SecsCommunicatorEvents {
 	disconnected: [];
 }
 
+/**
+ * @param deviceId The device ID.
+ * @param isEquip Whether the device is an equip.
+ * @param name The name of the connection.
+ * @param timeoutT1 Only SECS-I supports this parameter, ENQ retransmission interval.
+ * @param timeoutT2 Only SECS-I supports this parameter, ENQ wait-for-response timeout.
+ * @param timeoutT3 Support SECS-I and SECS-II, W-Bit timeout.
+ * @param timeoutT4 Only SECS-I supports this parameter, data block retransmission interval.
+ * @param timeoutT5 Support SECS-I and SECS-II, establishment of communication session timeout.
+ * @param timeoutT6 Only HSMS supports this parameter, reply control message timeout.
+ * @param timeoutT7 Only HSMS supports this parameter, create connection timeout.
+ * @param timeoutT8 Only HSMS supports this parameter, the maximum time interval between message bytes when receiving a message
+ */
 export interface SecsCommunicatorConfig {
 	deviceId: number;
 	isEquip: boolean;

@@ -17,7 +17,7 @@ export class Secs1Message extends SecsMessage {
 	}
 
 	/**
-	 * Splits the message into SECS-I blocks.
+	 * @description Splits the message into SECS-I blocks.
 	 */
 	toBlocks(): Secs1MessageBlock[] {
 		const bodyBuffer = this.body ? this.body.toBuffer() : Buffer.alloc(0);
