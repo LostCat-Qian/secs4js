@@ -26,3 +26,6 @@ export * from "./secs1/Secs1Communicator.js";
 export * from "./secs1/Secs1OnTcpIpActiveCommunicator.js";
 export * from "./secs1/Secs1OnTcpIpPassiveCommunicator.js";
 export * from "./secs1/Secs1SerialCommunicator.js";
+
+export * from "./gem/Clock.js";
+export * from "./gem/Gem.js";
