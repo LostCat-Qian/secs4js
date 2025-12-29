@@ -28,6 +28,7 @@ export default defineConfig(
 			},
 		},
 		rules: {
+			"@typescript-eslint/no-unsafe-member-access": "warn",
 			"@typescript-eslint/require-await": "warn",
 			"@typescript-eslint/no-unsafe-enum-comparison": "off",
 			// 未使用变量 - 设为警告

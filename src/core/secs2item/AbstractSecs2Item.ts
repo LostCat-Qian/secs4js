@@ -1,13 +1,39 @@
 import { SecsItemType } from "../enums/SecsItemType.js";
 
 export abstract class AbstractSecs2Item<T = unknown> {
+	[index: number]: any;
+
 	constructor(
 		public readonly type: SecsItemType,
 		protected readonly _value: T,
-	) {}
+	) {
+		return new Proxy(this, {
+			get: (target, prop, receiver) => {
+				if (typeof prop === "string") {
+					const index = Number(prop);
+					if (Number.isInteger(index) && index >= 0) {
+						return target.getByIndex(index);
+					}
+				}
+				return Reflect.get(target, prop, receiver);
+			},
+		});
+	}
 
 	get value(): T {
 		return this._value;
+	}
+
+	protected getByIndex(index: number): unknown {
+		const v = this._value;
+		if (Array.isArray(v) || Buffer.isBuffer(v) || typeof v === "string") {
+			return v[index];
+		}
+		// Scalar value
+		if (index === 0) {
+			return v;
+		}
+		return undefined;
 	}
 
 	/**

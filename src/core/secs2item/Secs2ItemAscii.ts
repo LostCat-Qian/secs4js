@@ -1,6 +1,12 @@
 import { SecsItemType } from "../enums/SecsItemType.js";
 import { AbstractSecs2Item } from "./AbstractSecs2Item.js";
 
+/**
+ * @description
+ * ASCII string item is a string item that contains only ASCII characters.
+ * @example
+ * new Secs2ItemAscii("Hello World");
+ */
 export class Secs2ItemAscii extends AbstractSecs2Item<string> {
 	constructor(value: string) {
 		super(SecsItemType.A, value);
