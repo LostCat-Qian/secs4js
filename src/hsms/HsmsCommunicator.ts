@@ -47,6 +47,10 @@ export abstract class HsmsCommunicator extends AbstractSecsCommunicator<HsmsComm
 	// T6 Timer (Control Transaction)
 	// We use the same _transactions map for Control messages if they expect reply
 
+	public get connectionState(): HsmsState {
+		return this.state;
+	}
+
 	constructor(config: HsmsCommunicatorConfig) {
 		super(config);
 		this.ip = config.ip;

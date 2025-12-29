@@ -45,7 +45,7 @@ export interface SecsCommunicatorConfig {
 export abstract class AbstractSecsCommunicator<
 	Events extends Record<keyof Events, unknown[]> & SecsCommunicatorEvents =
 		SecsCommunicatorEvents,
-> extends EventEmitter<Events> {
+> extends EventEmitter {
 	public readonly deviceId: number;
 	public readonly isEquip: boolean;
 	public readonly name: string;

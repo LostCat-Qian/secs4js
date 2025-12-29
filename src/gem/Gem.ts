@@ -34,7 +34,7 @@ export class Gem {
 	public softrev: string = Gem.DEFAULT_SOFTREV;
 	public clockType: ClockType = Gem.DEFAULT_CLOCK_TYPE;
 
-	constructor(private comm: AbstractSecsCommunicator) {}
+	constructor(public comm: AbstractSecsCommunicator<any>) {}
 
 	// S1F13 - Establish Communications Request
 	async s1f13(): Promise<number> {
