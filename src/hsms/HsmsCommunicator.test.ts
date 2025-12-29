@@ -60,8 +60,12 @@ describe("HsmsCommunicator T7", () => {
 
 		const socket = new TestSocket();
 		const errors: string[] = [];
-		comm.on("error", (err) => {
-			errors.push(err.message);
+		comm.on("error", (err: unknown) => {
+			if (err instanceof Error) {
+				errors.push(err.message);
+				return;
+			}
+			errors.push(String(err));
 		});
 
 		comm.exposeHandleSocketEvents(socket as unknown as Socket);

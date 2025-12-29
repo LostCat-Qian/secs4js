@@ -71,12 +71,14 @@ export class HsmsPassiveCommunicator extends HsmsCommunicator {
 						err instanceof Error ? err : new Error(String(err)),
 					);
 				}
+				if (!this.shouldStop) {
+					await new Promise((resolve) =>
+						setTimeout(resolve, this.timeoutRebind * 1000),
+					);
+				}
 			}
 			first = false;
 			if (this.shouldStop) return;
-			await new Promise((resolve) =>
-				setTimeout(resolve, this.timeoutRebind * 1000),
-			);
 		}
 	}
 
@@ -92,22 +94,62 @@ export class HsmsPassiveCommunicator extends HsmsCommunicator {
 			});
 			this.server = server;
 
-			const onError = (err: Error) => {
-				this.server = null;
-				reject(err);
+			let hasConnected = false;
+			let settled = false;
+
+			const cleanup = () => {
+				server.removeListener("error", onServerError);
+				server.removeListener("close", onServerClose);
+				this.removeListener("connected", onConnected);
+				this.removeListener("disconnected", onDisconnected);
 			};
 
-			server.once("error", onError);
-
-			server.on("close", () => {
+			const finish = (err?: Error) => {
+				if (settled) return;
+				settled = true;
 				if (this.server === server) {
 					this.server = null;
 				}
-				resolve();
-			});
+				cleanup();
+				if (err) reject(err);
+				else resolve();
+			};
+
+			const closeServer = () => {
+				if (settled) return;
+				if (!server.listening) {
+					finish();
+					return;
+				}
+				server.close((err) => {
+					if (err) finish(err);
+					else finish();
+				});
+			};
+
+			const onServerError = (err: Error) => {
+				finish(err);
+			};
+
+			const onServerClose = () => {
+				finish();
+			};
+
+			const onConnected = () => {
+				hasConnected = true;
+			};
+
+			const onDisconnected = () => {
+				if (!hasConnected) return;
+				closeServer();
+			};
+
+			server.on("error", onServerError);
+			server.on("close", onServerClose);
+			this.on("connected", onConnected);
+			this.on("disconnected", onDisconnected);
 
 			server.listen(this.port, this.ip, () => {
-				server.removeListener("error", onError);
 				onListening?.();
 			});
 		});

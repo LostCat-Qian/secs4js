@@ -3,6 +3,7 @@ import { SecsMessage } from "../core/AbstractSecsMessage.js";
 import { Secs2ItemAscii } from "../core/secs2item/Secs2ItemAscii.js";
 import { Secs2ItemBinary } from "../core/secs2item/Secs2ItemBinary.js";
 import { Secs2ItemList } from "../core/secs2item/Secs2ItemList.js";
+import { A, B, L } from "../helper/Secs2ItemHelper.js";
 import { Clock, ClockType } from "./Clock.js";
 
 export enum CommAck {
@@ -34,18 +35,20 @@ export class Gem {
 	public softrev: string = Gem.DEFAULT_SOFTREV;
 	public clockType: ClockType = Gem.DEFAULT_CLOCK_TYPE;
 
-	constructor(public comm: AbstractSecsCommunicator<any>) {}
+	constructor(public comm: AbstractSecsCommunicator) {}
+
+	// S1F2 - Are You There?
+	async s1f2(primaryMsg: SecsMessage): Promise<void> {
+		await this.comm.reply(primaryMsg, 1, 2, L());
+	}
 
 	// S1F13 - Establish Communications Request
 	async s1f13(): Promise<number> {
 		let body: Secs2ItemList;
 		if (this.comm.isEquip) {
-			body = new Secs2ItemList([
-				new Secs2ItemAscii(this.mdln),
-				new Secs2ItemAscii(this.softrev),
-			]);
+			body = L(A(this.mdln), A(this.softrev));
 		} else {
-			body = new Secs2ItemList([]);
+			body = L();
 		}
 
 		const reply = await this.comm.send(1, 13, true, body);
@@ -63,18 +66,9 @@ export class Gem {
 	async s1f14(primaryMsg: SecsMessage, commAck: CommAck): Promise<void> {
 		let body: Secs2ItemList;
 		if (this.comm.isEquip) {
-			body = new Secs2ItemList([
-				new Secs2ItemBinary(Buffer.from([commAck])),
-				new Secs2ItemList([
-					new Secs2ItemAscii(this.mdln),
-					new Secs2ItemAscii(this.softrev),
-				]),
-			]);
+			body = L(B(Buffer.from([commAck])), L(A(this.mdln), A(this.softrev)));
 		} else {
-			body = new Secs2ItemList([
-				new Secs2ItemBinary(Buffer.from([commAck])),
-				new Secs2ItemList([]),
-			]);
+			body = L(B(Buffer.from([commAck])), L());
 		}
 		await this.comm.reply(primaryMsg, 1, 14, body);
 	}
@@ -90,12 +84,7 @@ export class Gem {
 
 	// S1F16 - OFF-LINE Acknowledge
 	async s1f16(primaryMsg: SecsMessage): Promise<void> {
-		await this.comm.reply(
-			primaryMsg,
-			1,
-			16,
-			new Secs2ItemBinary(Buffer.from([OflAck.OK])),
-		);
+		await this.comm.reply(primaryMsg, 1, 16, B(Buffer.from([OflAck.OK])));
 	}
 
 	// S1F17 - Request ON-LINE
@@ -109,12 +98,7 @@ export class Gem {
 
 	// S1F18 - ON-LINE Acknowledge
 	async s1f18(primaryMsg: SecsMessage, onlAck: OnlAck): Promise<void> {
-		await this.comm.reply(
-			primaryMsg,
-			1,
-			18,
-			new Secs2ItemBinary(Buffer.from([onlAck])),
-		);
+		await this.comm.reply(primaryMsg, 1, 18, B(Buffer.from([onlAck])));
 	}
 
 	// S2F17 - Date and Time Request
@@ -157,12 +141,7 @@ export class Gem {
 
 	// S2F32 - Date and Time Set Acknowledge
 	async s2f32(primaryMsg: SecsMessage, tiAck: TiAck): Promise<void> {
-		await this.comm.reply(
-			primaryMsg,
-			2,
-			32,
-			new Secs2ItemBinary(Buffer.from([tiAck])),
-		);
+		await this.comm.reply(primaryMsg, 2, 32, B(Buffer.from([tiAck])));
 	}
 
 	// S9Fx Helpers
@@ -187,7 +166,7 @@ export class Gem {
 
 	private async s9fy(refMsg: SecsMessage, func: number): Promise<void> {
 		const header = this.getHeader10Bytes(refMsg);
-		await this.comm.send(9, func, false, new Secs2ItemBinary(header));
+		await this.comm.send(9, func, false, B(header));
 	}
 
 	private getHeader10Bytes(msg: SecsMessage): Buffer {

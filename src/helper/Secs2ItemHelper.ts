@@ -50,16 +50,21 @@ export function BOOLEAN(value: string): Secs2ItemBoolean {
  * @param value The value of the item.
  * @returns The SECS-II binary item.
  */
-export function B(value: string): Secs2ItemBinary {
-	const stringToBytes = (s: string) =>
-		s
-			.split(/\s+/)
-			.map((v) =>
-				v.trim().startsWith("0x") ? parseInt(v, 16) : parseInt(v, 10),
-			);
+export function B(value: string | Buffer): Secs2ItemBinary {
+	const valueType = typeof value;
+	if (valueType === "string") {
+		const stringToBytes = (s: string) =>
+			s
+				.split(/\s+/)
+				.map((v) =>
+					v.trim().startsWith("0x") ? parseInt(v, 16) : parseInt(v, 10),
+				);
 
-	const binaryValues: number[] = stringToBytes(value);
-	return Secs2ItemFactory.createBinaryItem(Buffer.from(binaryValues));
+		const binaryValues: number[] = stringToBytes(value as string);
+		return Secs2ItemFactory.createBinaryItem(Buffer.from(binaryValues));
+	}
+
+	return Secs2ItemFactory.createBinaryItem(value as Buffer);
 }
 
 /**

@@ -67,9 +67,9 @@ async function main() {
 	console.log(`Active received reply: ${reply?.toSml()}`);
 
 	// Keep running to allow testing disconnect/reconnect manually
-	setTimeout(() => {
-		return 0;
-	}, 10000000);
+	// setTimeout(() => {
+	// 	return 0;
+	// }, 10000000);
 }
 
 main().catch(console.error);

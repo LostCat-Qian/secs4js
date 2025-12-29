@@ -1,7 +1,7 @@
 import { SecsItemType } from "../enums/SecsItemType.js";
 
 export abstract class AbstractSecs2Item<T = unknown> {
-	[index: number]: any;
+	[index: number]: unknown;
 
 	constructor(
 		public readonly type: SecsItemType,

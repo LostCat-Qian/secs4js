@@ -123,6 +123,9 @@ export abstract class HsmsCommunicator extends AbstractSecsCommunicator<HsmsComm
 
 		socket.on("error", (err) => {
 			this.emit("error", err);
+			if (!socket.destroyed) {
+				socket.destroy();
+			}
 		});
 	}
 

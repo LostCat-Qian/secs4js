@@ -1,10 +1,8 @@
 import {
-	HsmsActiveCommunicator,
 	HsmsPassiveCommunicator,
 	Gem,
 	CommAck,
 	OnlAck,
-	Clock,
 	SecsMessage,
 } from "../src/index.js";
 
@@ -56,7 +54,7 @@ async function main() {
 		})();
 	});
 
-	equipComm.open().catch(console.error);
+	await equipComm.open();
 
 	// 2. Setup Host (Active)
 	// const hostComm = new HsmsActiveCommunicator({

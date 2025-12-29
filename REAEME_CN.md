@@ -1,25 +1,25 @@
 <h1 align="center">Secs4js</h1>
 
-<p align="center">A simple, efficient, and user-friendly SECS/GEM protocol library implemented in TypeScript.</p>
+<p align="center">一个简单、高效、用户友好的SECS/GEM协议库，使用TypeScript实现。</p>
 
-## Introduction
+## 介绍
 
-This project is a TypeScript implementation of the SECS/GEM protocol, inspired by [pysemisecs](https://github.com/kenta-shimizu/pysemisecs).
+本项目是一个使用TypeScript实现的SECS/GEM协议库，灵感来源于 [pysemisecs](https://github.com/kenta-shimizu/pysemisecs)。
 
-A special thanks to the author **kenta-shimizu** for their open-source contribution.
+非常感谢作者 **kenta-shimizu** 的开源贡献。
 
-Secs4js is a simple, efficient, and user-friendly SECS/GEM protocol library implemented in TypeScript. It provides a straightforward way to communicate with SECS/GEM devices, enabling you to easily read and write data using the SECS/GEM protocol.
+Secs4js是一个简单、高效、用户友好的SECS/GEM协议库，使用TypeScript实现。它提供了一种与SECS/GEM设备通信的简单方式，使您能够轻松地使用SECS/GEM协议读写数据。
 
-## Supported Features
+## 支持的功能
 
 - SECS-I (SEMI-E4)
-- SECS-I Virtual Serial Port (SECS-I on TCP/IP)
+- SECS-I 虚拟串口 (SECS-I on TCP/IP)
 - SECS-II (SEMI-E5)
 - GEM (SEMI-E30)
 - HSMS-SS (SEMI-E37.1)
-- **No HSMS-GS (SEMI-E37.2)**
+- **不支持 HSMS-GS (SEMI-E37.2)**
 
-## Installation
+## 安装
 
 ```shell
 npm i secs4js
@@ -31,11 +31,11 @@ yarn add secs4js
 bun add secs4js
 ```
 
-## Getting Started from Source
+## 从源代码开始
 
-If you want to run some examples, they can be found in the `examples` directory.
+如果您希望运行一些例子，那么可以在 `examples` 目录下找到。
 
-Run the following commands to start these examples:
+运行以下命令来启动这些例子：
 
 ```shell
 pnpm dlx tsx examples/gem_example.ts
@@ -44,17 +44,17 @@ pnpm dlx tsx examples/gem_example.ts
 pnpm dlx tsx examples/<example_file_name>.ts
 ```
 
-## Usage
+## 使用方法
 
-### 1. Creating SECS-II Messages
+### 1. 创建SECS-II消息
 
-I provide a concise, clear, and efficient way to create SECS-II message types. You can use the following code to import the required items:
+我提供了一种简洁、清晰、高效的方式来创建SECS-II的消息类型。您可以使用以下代码导入所需的项：
 
 ```ts
 import { B, U1, U2, U4, U8, I1, I2, I4, I8, F4, F8, A, L } from "secs4js";
 ```
 
-Using these items, you can easily create SECS-II message types. For example, to create a message containing L, A, and U1 items, you can use the following code:
+使用这些项，您可以轻松地创建SECS-II的消息类型。例如，要创建一个包含L、A、U1项的消息，您可以使用以下代码：
 
 ```ts
 import { L, A, U1, SecsMessage } from "secs4js";
@@ -62,54 +62,54 @@ import { L, A, U1, SecsMessage } from "secs4js";
 const body: AbstractSecs2Item = L(A("Hello, SECS/GEM!"), U1(123));
 ```
 
-Doesn't this highly resemble SML text syntax?
+这是不是与SML文本语法高度一致？
 
-All SECS-II messages are derived from the `AbstractSecs2Item` class, so you can use it to declare any SECS-II message of unknown type.
+所有的SECS-II消息都来抽象自 `AbstractSecs2Item` 类，所以你可以在任何未知具体类型的SECS-II消息中使用它来声明。
 
-If you don't like this approach, you can also use SML text syntax or the factory methods we provide to create SECS-II messages.
+如果你不喜欢这种方式，您也可以使用SML文本语法或者我们提供的工厂方法来创建SECS-II消息。
 
-Factory methods:
+工厂方法：
 
 ```ts
 import { Secs2ItemFactory } from "secs4js";
 
-// Create a message containing L, A, and U1 items
+// 创建一个包含L、A、U1项的消息
 const newMsg = Secs2ItemFactory.createListItem(
 	Secs2ItemFactory.createAsciiItem("Hello World"),
 	Secs2ItemFactory.createU1Item(123),
 );
 ```
 
-SML Conversion Support:
+SML转换支持：
 
-You can use the `toSml` method of the `AbstractSecs2Item` class to convert SECS-II messages to SML text. For example:
+您可以使用 `AbstractSecs2Item` 类的 `toSml` 方法将SECS-II消息转换为SML文本。例如：
 
 ```ts
 console.log(newMsg.toSml());
 
-// Output:
+// 输出结果：
 // <L
 //     <A "Hello World">
 //     <U1 123>
 // >.
 ```
 
-### 2. Creating SECS Messages
+### 2. 创建SECS Message
 
-We provide two ways to create SECS-II messages:
+我们提供了两种方式来创建SECS-II消息：
 
-1. Use the `SecsMessage` class to create SECS-II messages.
-2. Create SECS-II messages by parsing SML syntax text. You can use the `SmlParser` static class to parse SML text and create corresponding SECS-II messages.
+1. 使用 `SecsMessage` 类来创建SECS-II消息。
+2. 通过对 SML 语法进行文本解析来创建SECS-II消息。您可以使用 `SmlParser` 静态类来解析SML文本并创建对应的SECS-II消息。
 
 #### new SecsMessage(...)
 
-> You can use the `SecsMessage` class to create SECS-II messages. The class constructor accepts the following parameters:
+> 您可以使用 `SecsMessage` 类来创建SECS-II消息。该类的构造函数接受以下参数：
 >
-> - `stream`: Stream number, one byte, range 0-255.
-> - `function`: Function number, one byte, range 0-255.
-> - `wBit`: W-bit, a boolean indicating whether to enable W-bit (i.e., whether a reply is required).
-> - `body`: SECS-II message body, an `AbstractSecs2Item` instance.
-> - We will automatically generate the message's `length` and `systemBytes`, so you don't need to manage them manually.
+> - `stream`：流号，一个字节，范围为 0-255。
+> - `function`: 功能号，一个字节，范围为 0-255。
+> - `wBit`：W位，一个布尔值，指示是否启用W位（即是否需要回复）。
+> - `body`：SECS-II消息体，一个 `AbstractSecs2Item` 实例。
+> - 我们会自动生成消息的 `length` 和 `systemBytes`，您无需手动管理。
 
 ```ts
 import { SecsMessage } from "secs4js";
@@ -122,7 +122,7 @@ const newMsg = new SecsMessage(1, 13, true, L(L(A("Hello World"), U1(123))));
 ```ts
 import { SmlParser } from "secs4js";
 
-// Complete SML text
+// 完整的SML文本
 const sml = `
     S1F13 W
     <L
@@ -131,7 +131,7 @@ const sml = `
     >.
     `;
 
-// SML text containing only the message body
+// 仅包含消息体的SML文本
 const smlBody = `
     <L
         <B 0x20>
@@ -139,7 +139,7 @@ const smlBody = `
     >.
     `;
 
-// Parse complete SML text into a SecsMessage instance using the parse method
+// 通过 parse 方法解析完整的SML文本为 SecsMessage 实例
 const parsedMessage = SmlParser.parse(sml);
 const firstBodyItem =
 	parsedMessage.body instanceof Secs2ItemList
@@ -154,18 +154,18 @@ console.log(
 	bytes,
 );
 
-// Parse SML text containing only the message body into an AbstractSecs2Item instance using the parseBody method
+// 通过 parseBody 方法解析仅包含消息体的SML文本为 AbstractSecs2Item 实例
 const parsedBody = SmlParser.parseBody(smlBody);
 console.log(parsedBody?.toSml());
 ```
 
 ## HSMS-SS
 
-For HSMS-SS protocol support, you can act as the passive end (Equipment) or the active end (HOST/EAP).
+对 HSMS-SS 协议的支持，您可以作为被动端（设备）或主动端（HOST/EAP）。
 
 ### Active
 
-Quick start:
+快速开始：
 
 ```ts
 const active = new HsmsActiveCommunicator({
@@ -173,7 +173,7 @@ const active = new HsmsActiveCommunicator({
 	port: 5000,
 	deviceId: 10,
 	isEquip: false,
-	// If you need to customize the timeout values, you can add additional parameters
+	// 如果你对超时时间需要进行自定义，也可以添加额外的参数
 	// timeoutT1: 10,
 	// ...
 });
@@ -189,7 +189,7 @@ console.log("Active opened");
 
 await active.untilConnected(); // Wait for Select success
 
-// When you need to receive and process messages, you can listen for the "message" event
+// 当需要在接收到消息并进行处理时，您可以监听 "message" 事件
 active.on("message", (msg: SecsMessage) => {
 	void (async () => {
 		console.log(`Active received: ${msg.toSml()}`);
@@ -205,8 +205,8 @@ active.on("message", (msg: SecsMessage) => {
 const reply = await active.send(1, 1, true);
 console.log(`Active received reply: ${reply?.toSml()}`);
 
-// Interaction results with the simulator
-// Our reply message:
+// 与模拟器的交互运行结果
+// 我们回复的消息：
 // 2025-12-30 01:26:44.866:onReceivedEvent[TOOL] DeviceID=[10] SB=[6110]
 // S1F2
 // <L[2/1]
@@ -214,18 +214,18 @@ console.log(`Active received reply: ${reply?.toSml()}`);
 // 	<A[9/1] "SOFTREV-1">
 // >.
 
-// Message actively sent by the simulator:
+// 模拟器主动发送的消息：
 // 2025-12-30 01:26:44.864:OnSent[TOOL] DeviceID=[1] SB=[6110]
 
 // S1F1 W.
 // 2025-12-30 01:26:44.864:Send the Message successfully.
 
-// Message replied by the simulator:
+// 模拟器回复的消息：
 // 2025-12-30 01:26:40.449:OnSent[TOOL] DeviceID=[10] SB=[2]
 // S1F2
 // <L[0/1]>.
 
-// Message we actively sent:
+// 我们主动发送的消息：
 // 2025-12-30 01:26:40.445:Do not find Tool in QutoReply List by Tool[TOOL] SFName=[S1F1]
 // 2025-12-30 01:26:40.444:onReceivedEvent[TOOL] DeviceID=[10] SB=[2]
 // S1F1 W.
@@ -242,7 +242,7 @@ import {
 	Gem,
 } from "secs4js";
 
-// 1. Set up Equipment side (Passive)
+// 1. 设置设备端 (Passive)
 const equipComm = new HsmsPassiveCommunicator({
 	ip: "127.0.0.1",
 	port: 5000,
@@ -251,12 +251,12 @@ const equipComm = new HsmsPassiveCommunicator({
 	name: "Equipment",
 });
 
-// Use the GEM helper class (optional)
+// 使用 GEM 助手类（可选）
 const equipGem = new Gem(equipComm);
 equipGem.mdln = "MyEquip";
 equipGem.softrev = "1.0.0";
 
-// Handle received messages
+// 处理接收到的消息
 equipComm.on("message", (msg: SecsMessage) => {
 	void (async () => {
 		try {
@@ -291,13 +291,13 @@ console.log("Passive opened and listening");
 
 ## SECS-I Serial
 
-Supports SECS-I communication via serial port.
+支持通过串口进行 SECS-I 通信。
 
-**Note**:
+**注意**：
 
-- Serial port communication needs to be tested on devices that support the SECS-I protocol.
-- Ensure the serial port path and baud rate match your device configuration.
-- If you want to test locally first, we recommend using a **virtual serial port tool** to simulate serial port communication.
+- 串口通信需要在支持 SECS-I 协议的设备上进行测试。
+- 确保串口路径和波特率与您的设备配置匹配。
+- 如果您想先进行本地测试，那么我们推荐您使用**虚拟串口工具**来模拟串口通信。
 
 ### Active
 
@@ -306,10 +306,10 @@ import { A, L, Secs1SerialCommunicator, SecsMessage } from "secs4js";
 
 async function SerialActive() {
 	const active = new Secs1SerialCommunicator({
-		path: "COM5", // Serial port path
-		baudRate: 9600, // Baud rate
+		path: "COM5", // 串口路径
+		baudRate: 9600, // 波特率
 		deviceId: 10,
-		isEquip: false, // Whether it is equipment
+		isEquip: false, // 是否为设备
 	});
 
 	active.on("message", (msg: SecsMessage) => {
@@ -331,8 +331,8 @@ async function SerialActive() {
 
 SerialActive().catch((err) => console.error(err));
 
-// Communication results with the simulator
-// Our reply message:
+// 与模拟器的通信结果
+// 我们回复的消息：
 // 2025-12-30 01:35:40.187:onReceivedEvent[SERIAL_EQP] DeviceID=[10] SB=[5985]
 // S1F2
 // <L[2/1]
@@ -340,7 +340,7 @@ SerialActive().catch((err) => console.error(err));
 // 	<A[9/1] "SOFTREV-1">
 // >.
 
-// Message actively sent by the simulator:
+// 模拟器主动发送的消息：
 // 2025-12-30 01:35:40.155:OnSent[SERIAL_EQP] DeviceID=[1] SB=[5985]
 
 // S1F1 W.
@@ -378,7 +378,7 @@ SerialPassive().catch((err) => console.error(err));
 
 ## SECS-I On TCP/IP
 
-Supports SECS-I serial communication via TCP/IP (usually used for testing or connecting through a terminal server).
+支持通过 TCP/IP 模拟串口 SECS-I 通信（通常用于测试或通过终端服务器连接）。
 
 ### Active
 
@@ -396,7 +396,7 @@ async function TcpActive() {
 	active.on("message", (msg: SecsMessage) => {
 		void (async () => {
 			console.log(`Active received: ${msg.toSml()}`);
-			// Handle message...
+			// 处理消息...
 		})();
 	});
 
@@ -424,7 +424,7 @@ async function TcpPassive() {
 	passive.on("message", (msg: SecsMessage) => {
 		void (async () => {
 			console.log(`Passive received: ${msg.toSml()}`);
-			// Process message and reply...
+			// 处理消息并回复...
 		})();
 	});
 
@@ -433,10 +433,10 @@ async function TcpPassive() {
 }
 ```
 
-## Development
+## 开发
 
-If you are interested in this project, welcome to contribute your code!
+如果您对本项目感兴趣，欢迎贡献您的代码！
 
-Thank you for your contribution! 💖
+感谢您的贡献！💖
 
-> 💝 This project was generated using [`create-typescript-app`](https://github.com/JoshuaKGoldberg/create-typescript-app) and the [Bingo framework](https://create.bingo).
+> 💝 此项目使用 [`create-typescript-app`](https://github.com/JoshuaKGoldberg/create-typescript-app) 和 [Bingo框架](https://create.bingo) 生成。
