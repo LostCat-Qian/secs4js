@@ -51,7 +51,22 @@ pnpm dlx tsx examples/<example_file_name>.ts
 我提供了一种简洁、清晰、高效的方式来创建SECS-II的消息类型。您可以使用以下代码导入所需的项：
 
 ```ts
-import { B, U1, U2, U4, U8, I1, I2, I4, I8, F4, F8, A, L } from "secs4js";
+import {
+	B,
+	BOOLEAN,
+	U1,
+	U2,
+	U4,
+	U8,
+	I1,
+	I2,
+	I4,
+	I8,
+	F4,
+	F8,
+	A,
+	L,
+} from "secs4js";
 ```
 
 使用这些项，您可以轻松地创建SECS-II的消息类型。例如，要创建一个包含L、A、U1项的消息，您可以使用以下代码：
@@ -157,6 +172,75 @@ console.log(
 // 通过 parseBody 方法解析仅包含消息体的SML文本为 AbstractSecs2Item 实例
 const parsedBody = SmlParser.parseBody(smlBody);
 console.log(parsedBody?.toSml());
+```
+
+### 3. 从 SECS-II 消息中提取数据
+
+提取数据采用数组索引器的方式，然后通过 `.value` 属性获取具体的值。
+我们会做一些更适配用户习惯的解析，例如 `<BOOLEAN TRUE FALSE>` 会被解析为 `[true, false]` 布尔数组。
+如果是单个值的话我们会直接返回这个值，而不是包裹在数组中，例如 `<U1 123>` 会被解析为 `123`。
+
+详细的用法可以参考下面的代码示例，需要注意的是针对于每一个获取到的节点，需要进行类型断言，以确保 TypeScript 的类型安全。
+
+```ts
+import {
+	A,
+	L,
+	Secs2ItemAscii,
+	Secs2ItemList,
+	Secs2ItemNumeric,
+	SmlParser,
+} from "secs4js";
+
+function getItemValue() {
+	const body = L(A("MDLN-A"), A("SOFTREV-1"));
+	const firstA = body?.[0] as Secs2ItemAscii;
+	console.log("MDLN: ", firstA.value);
+
+	const smlBody = `
+        <L
+            <A "OK" >
+            <U1 20 >
+            <U2 1000 2000 >
+            <U4 100000000 200000000 >
+            <U8 1000000000000000 2000000000000 >
+            <I1 10 20 >
+            <I2 1000 -2000 >
+            <I4 100 >
+            <I8 -1234567890123456 9973232131213124 >
+            <F4 3.14 -6.18 >
+            <F8 1.234567890123456 6.18 >
+            <B 0x10 0x20 >
+            <Boolean TRUE FALSE >
+            <L
+                <A "Nested" >
+                <F4 3.14 >
+                <L
+                    <A "More Nested">
+                    <Boolean F>
+                >
+            >
+        >
+    `;
+	const smlBodySecs2Items = SmlParser.parseBody(smlBody);
+	const zeroItem = smlBodySecs2Items?.[0] as Secs2ItemAscii;
+	const firstU1 = smlBodySecs2Items?.[1] as Secs2ItemNumeric;
+	const secondItem = smlBodySecs2Items?.[2] as Secs2ItemNumeric;
+	const eighthItem = smlBodySecs2Items?.[8] as Secs2ItemNumeric;
+	const tenthItem = smlBodySecs2Items?.[10] as Secs2ItemNumeric;
+	const twelfthItem = smlBodySecs2Items?.[12] as Secs2ItemNumeric;
+	const nestedList = smlBodySecs2Items?.[13] as Secs2ItemList;
+	const nestedListFirstItem = nestedList?.[0] as Secs2ItemAscii;
+	console.log("ASCII value: ", zeroItem.value);
+	console.log("U1 value: ", firstU1.value);
+	console.log("U2 value: ", secondItem.value);
+	console.log("I8 value: ", eighthItem.value);
+	console.log("F8 value: ", tenthItem.value);
+	console.log("BOOLEAN value: ", twelfthItem.value);
+	console.log("NESTED ASCII value: ", nestedListFirstItem.value);
+}
+
+getItemValue();
 ```
 
 ## 发送消息与回复消息
@@ -491,7 +575,7 @@ equipComm.on("message", (msg: SecsMessage) => {
 ## 日志
 
 日志使用 `Pino` 库进行记录。
-日志分为两种，第一种是记录所有详细信息的 `DETAIL` 日志，第二种是仅记录双端交流的SECS-II `SML` 日志，DETAIL日志的默认级别为`DEBUG`，SECS-II日志的默认级别为`INFO`。
+日志分为两种，第一种是记录所有详细信息的 `DETAIL` 日志，第二种是仅记录双端交流的SECS-II `SML` 日志，DETAIL日志的默认级别为 `DEBUG`，SECS-II日志的默认级别为 `INFO`。
 
 您可以在初始化通信器时通过传递 `log` 配置参数来配置日志的属性。
 
