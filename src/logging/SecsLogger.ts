@@ -576,6 +576,7 @@ export class SecsLogger {
 		sml: string,
 		deviceId: number,
 		systemBytes: number,
+		buffer?: Buffer,
 	): void {
 		this.secs2.info(
 			{
@@ -583,6 +584,7 @@ export class SecsLogger {
 				sml: normalizeSmlForSingleLine(sml),
 				deviceId,
 				systemBytes,
+				hex: buffer ? bufferToHex(buffer, this.maxHexBytes) : undefined,
 			},
 			"",
 		);

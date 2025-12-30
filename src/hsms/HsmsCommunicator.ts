@@ -267,6 +267,7 @@ export abstract class HsmsCommunicator extends AbstractSecsCommunicator<HsmsComm
 				msg.toSml(),
 				this.deviceId,
 				msg.systemBytes,
+				msg.toBuffer(),
 			);
 			void this.sendReject(msg, RejectReason.NotSelected);
 			return;

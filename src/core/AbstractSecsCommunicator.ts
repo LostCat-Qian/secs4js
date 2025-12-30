@@ -138,7 +138,8 @@ export abstract class AbstractSecsCommunicator<
 		const systemBytes = this.getNextSystemBytes();
 		const msg = this.createMessage(stream, func, wBit, body, systemBytes);
 		const sml = msg.toSml();
-		this.logger.logSecs2("Sent", sml, this.deviceId, systemBytes);
+		const buffer = msg.toBuffer();
+		this.logger.logSecs2("Sent", sml, this.deviceId, systemBytes, buffer);
 		this.logger.detail.debug(
 			{
 				protocol: "SECS",
@@ -167,7 +168,7 @@ export abstract class AbstractSecsCommunicator<
 
 				this._transactions.set(systemBytes, { resolve, reject, timer });
 
-				this.sendBufferWithLogs("Sent", "SECS", msg.toBuffer(), {
+				this.sendBufferWithLogs("Sent", "SECS", buffer, {
 					stream,
 					func,
 					wBit,
@@ -189,7 +190,7 @@ export abstract class AbstractSecsCommunicator<
 				});
 			});
 		} else {
-			await this.sendBufferWithLogs("Sent", "SECS", msg.toBuffer(), {
+			await this.sendBufferWithLogs("Sent", "SECS", buffer, {
 				stream,
 				func,
 				wBit,
@@ -213,7 +214,14 @@ export abstract class AbstractSecsCommunicator<
 			primaryMsg.systemBytes,
 		);
 		const sml = msg.toSml();
-		this.logger.logSecs2("Sent", sml, this.deviceId, primaryMsg.systemBytes);
+		const buffer = msg.toBuffer();
+		this.logger.logSecs2(
+			"Sent",
+			sml,
+			this.deviceId,
+			primaryMsg.systemBytes,
+			buffer,
+		);
 		this.logger.detail.debug(
 			{
 				protocol: "SECS",
@@ -226,7 +234,7 @@ export abstract class AbstractSecsCommunicator<
 			},
 			"sml",
 		);
-		await this.sendBufferWithLogs("Sent", "SECS", msg.toBuffer(), {
+		await this.sendBufferWithLogs("Sent", "SECS", buffer, {
 			stream,
 			func,
 			wBit: false,
@@ -241,7 +249,14 @@ export abstract class AbstractSecsCommunicator<
 
 	protected handleMessage(msg: SecsMessage) {
 		const sml = msg.toSml();
-		this.logger.logSecs2("Received", sml, this.deviceId, msg.systemBytes);
+		const buffer = msg.toBuffer();
+		this.logger.logSecs2(
+			"Received",
+			sml,
+			this.deviceId,
+			msg.systemBytes,
+			buffer,
+		);
 
 		this.logger.detail.debug(
 			{
