@@ -1,11 +1,24 @@
 {
 	"name": "secs4js",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"description": "A simple, efficient, and user-friendly SECS/GEM protocol library implemented in TypeScript.",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/LostCat-Qian/secs4js.git"
 	},
+	"tags": [
+		"secs",
+		"secs-i",
+		"secs-ii",
+		"secsgem",
+		"javascript",
+		"semi",
+		"nodejs",
+		"gem",
+		"protocol",
+		"library",
+		"typescript"
+	],
 	"license": "MIT",
 	"author": {
 		"name": "Ran Qian",

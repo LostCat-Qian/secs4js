@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { Writable } from "stream";
+import { Writable, Transform } from "stream";
 import pino, { type LevelWithSilent, type Logger } from "pino";
 
 export type SecsLogDirection = "Received" | "Sent";
@@ -67,6 +67,149 @@ function bufferToHex(buffer: Buffer, maxHexBytes: number): string {
 	const hex = slice.toString("hex");
 	const suffix = len <= max ? "" : `…(+${String(len - max)} bytes)`;
 	return `${hex}${suffix}`;
+}
+
+class PrettyPrintTransformStream extends Transform {
+	private pending = "";
+
+	constructor() {
+		super();
+	}
+
+	override _transform(
+		chunk: Buffer | string,
+		_encoding: BufferEncoding,
+		callback: (error?: Error | null) => void,
+	): void {
+		try {
+			const str = typeof chunk === "string" ? chunk : chunk.toString("utf8");
+			this.pending += str;
+			this.flush();
+			callback();
+		} catch (e) {
+			callback(e instanceof Error ? e : new Error(String(e)));
+		}
+	}
+
+	override _flush(callback: (error?: Error | null) => void): void {
+		callback();
+	}
+
+	private flush(): void {
+		while (true) {
+			const idx = this.pending.indexOf("\n");
+			if (idx < 0) break;
+			const line = this.pending.slice(0, idx);
+			this.pending = this.pending.slice(idx + 1);
+			if (line.length === 0) continue;
+			const obj = JSON.parse(line) as Record<string, unknown>;
+			const formatted = this.formatLine(obj);
+			this.push(formatted);
+		}
+	}
+
+	private formatLine(obj: Record<string, unknown>): string {
+		const time = this.formatTime(obj.time);
+		const level = this.formatLevel(obj.level as number);
+		const extra = this.formatExtra(obj);
+		const msg = this.formatMessage(obj);
+
+		return `${time} ${level} ${extra} | ${msg}\n`;
+	}
+
+	private formatTime(timeValue: unknown): string {
+		if (typeof timeValue === "number") {
+			return formatDateTime(new Date(timeValue));
+		}
+		if (typeof timeValue === "string") {
+			return formatDateTime(new Date(timeValue));
+		}
+		return formatDateTime(new Date());
+	}
+
+	private formatLevel(level: number): string {
+		const levels: Record<number, string> = {
+			10: "TRACE",
+			20: "DEBUG",
+			30: "INFO ",
+			40: "WARN ",
+			50: "ERROR",
+			60: "FATAL",
+		};
+		return levels[level] ?? "UNKNOWN";
+	}
+
+	private formatExtra(obj: Record<string, unknown>): string {
+		const parts: string[] = [];
+
+		if (typeof obj.protocol === "string") {
+			parts.push(obj.protocol);
+		}
+		if (typeof obj.dir === "string") {
+			parts.push(obj.dir);
+		}
+		if (typeof obj.prev === "string" && typeof obj.next === "string") {
+			parts.push(`${obj.prev} -> ${obj.next}`);
+		}
+
+		return parts.join(" ");
+	}
+
+	private formatMessage(obj: Record<string, unknown>): string {
+		const msgValue = obj.msg;
+		if (typeof msgValue === "string" && msgValue.trim().length > 0) {
+			return msgValue;
+		}
+
+		const excludeKeys = new Set([
+			"time",
+			"level",
+			"msg",
+			"name",
+			"deviceId",
+			"isEquip",
+			"protocol",
+			"dir",
+			"prev",
+			"next",
+		]);
+
+		const pairs: string[] = [];
+		for (const [key, value] of Object.entries(obj)) {
+			if (excludeKeys.has(key)) continue;
+			if (Buffer.isBuffer(value)) {
+				pairs.push(`${key}=${value.toString("hex")}`);
+			} else if (typeof value === "string") {
+				pairs.push(`${key}=${value}`);
+			} else if (typeof value === "number" || typeof value === "boolean") {
+				pairs.push(`${key}=${String(value)}`);
+			} else {
+				pairs.push(`${key}=${this.formatValue(value)}`);
+			}
+		}
+
+		return pairs.join(" ");
+	}
+
+	private formatValue(value: unknown): string {
+		if (value === null) return "null";
+		if (value === undefined) return "undefined";
+		if (typeof value === "string") return value;
+		if (typeof value === "number" || typeof value === "boolean") {
+			return String(value);
+		}
+		if (Buffer.isBuffer(value)) {
+			return value.toString("hex");
+		}
+		if (typeof value === "object") {
+			try {
+				return JSON.stringify(value);
+			} catch {
+				return "[object]";
+			}
+		}
+		return String(value as string | number | bigint | boolean);
+	}
 }
 
 class DailyRotatingFileStream extends Writable {
@@ -350,10 +493,14 @@ export class SecsLogger {
 			isEquip: ctx.isEquip,
 		};
 
-		const detailStreams: pino.StreamEntry[] = [{ stream: detailStream }];
+		const detailStreams: pino.StreamEntry[] = [
+			{ stream: detailStream as pino.DestinationStream },
+		];
 		if (consoleEnabled) {
+			const prettyStream = new PrettyPrintTransformStream();
+			prettyStream.pipe(process.stdout);
 			detailStreams.push({
-				stream: process.stdout,
+				stream: prettyStream,
 				level: detailLevel as pino.Level,
 			});
 		}
@@ -362,7 +509,9 @@ export class SecsLogger {
 			pino.multistream(detailStreams),
 		);
 
-		const secs2Streams: pino.StreamEntry[] = [{ stream: secs2Stream }];
+		const secs2Streams: pino.StreamEntry[] = [
+			{ stream: secs2Stream as pino.DestinationStream },
+		];
 		if (consoleEnabled) {
 			secs2Streams.push({
 				stream: process.stdout,
