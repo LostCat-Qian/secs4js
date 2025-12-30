@@ -17,6 +17,7 @@ export class Secs1SerialCommunicator extends Secs1Communicator {
 
 	constructor(config: Secs1SerialCommunicatorConfig) {
 		super(config);
+		this.isMaster = config.isEquip;
 		this.path = config.path;
 		this.baudRate = config.baudRate;
 	}

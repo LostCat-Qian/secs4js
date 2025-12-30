@@ -29,7 +29,7 @@ export class Secs1OnTcpIpPassiveCommunicator extends Secs1Communicator {
 				if (this.stream && !this.stream.destroyed) {
 					this.logger.detail.warn(
 						{
-							protocol: "SECS1",
+							protocol: "SECS-I-TCP/IP",
 							remoteAddress: socket.remoteAddress,
 							remotePort: socket.remotePort,
 						},
@@ -40,7 +40,7 @@ export class Secs1OnTcpIpPassiveCommunicator extends Secs1Communicator {
 				}
 				this.logger.detail.info(
 					{
-						protocol: "SECS1",
+						protocol: "SECS-I-TCP/IP",
 						remoteAddress: socket.remoteAddress,
 						remotePort: socket.remotePort,
 					},

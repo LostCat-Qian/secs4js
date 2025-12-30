@@ -58,10 +58,10 @@ export abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		this.stream = stream;
 		this.resetState();
 		this.buffer = Buffer.alloc(0);
-		this.logger.logState("SECS1", "NotConnected", "Connected");
+		this.logger.logState("SECS-I-TCP/IP", "NotConnected", "Connected");
 
 		stream.on("data", (data: Buffer) => {
-			this.logger.logBytes("Received", "SECS1", data, {
+			this.logger.logBytes("Received", "SECS-I-TCP/IP", data, {
 				chunkLength: data.length,
 			});
 			this.buffer = Buffer.concat([this.buffer, data]);
@@ -195,14 +195,14 @@ export abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	}
 
 	private handleT1Timeout() {
-		this.logger.detail.warn({ protocol: "SECS1" }, "t1 timeout");
+		this.logger.detail.warn({ protocol: "SECS-I-TCP/IP" }, "t1 timeout");
 		this.t1Timer = null;
 		this.emit("error", new Error("T1 Timeout"));
 		this.resetState();
 	}
 
 	private handleT2Timeout() {
-		this.logger.detail.warn({ protocol: "SECS1" }, "t2 timeout");
+		this.logger.detail.warn({ protocol: "SECS-I-TCP/IP" }, "t2 timeout");
 		this.t2Timer = null;
 		if (this.state === CommState.WAIT_EOT) {
 			this.retryCount++;
@@ -212,7 +212,7 @@ export abstract class Secs1Communicator extends AbstractSecsCommunicator {
 			} else {
 				this.logger.detail.info(
 					{
-						protocol: "SECS1",
+						protocol: "SECS-I-TCP/IP",
 						retryCount: this.retryCount,
 						retry: this.retry,
 					},
@@ -232,7 +232,7 @@ export abstract class Secs1Communicator extends AbstractSecsCommunicator {
 			} else {
 				this.logger.detail.info(
 					{
-						protocol: "SECS1",
+						protocol: "SECS-I-TCP/IP",
 						retryCount: this.retryCount,
 						retry: this.retry,
 					},
@@ -247,7 +247,7 @@ export abstract class Secs1Communicator extends AbstractSecsCommunicator {
 	}
 
 	private handleT4Timeout() {
-		this.logger.detail.warn({ protocol: "SECS1" }, "t4 timeout");
+		this.logger.detail.warn({ protocol: "SECS-I-TCP/IP" }, "t4 timeout");
 		this.t4Timer = null;
 		this.resetState();
 	}
@@ -276,7 +276,7 @@ export abstract class Secs1Communicator extends AbstractSecsCommunicator {
 					const byte = this.buffer[0];
 					this.buffer = this.buffer.subarray(1);
 					if (byte === ENQ) {
-						this.logger.detail.debug({ protocol: "SECS1" }, "rx ENQ");
+						this.logger.detail.debug({ protocol: "SECS-I-TCP/IP" }, "rx ENQ");
 						this.sendByte(EOT);
 						this.state = CommState.WAIT_BLOCK_LENGTH;
 						this.receivedBlocks = [];
@@ -289,14 +289,14 @@ export abstract class Secs1Communicator extends AbstractSecsCommunicator {
 					const byte = this.buffer[0];
 					this.buffer = this.buffer.subarray(1);
 					if (byte === EOT) {
-						this.logger.detail.debug({ protocol: "SECS1" }, "rx EOT");
+						this.logger.detail.debug({ protocol: "SECS-I-TCP/IP" }, "rx EOT");
 						this.clearT2();
 						this.currentBlockIndex = 0;
 						this.sendCurrentBlock();
 					} else if (byte === ENQ) {
 						if (!this.isMaster) {
 							this.logger.detail.debug(
-								{ protocol: "SECS1" },
+								{ protocol: "SECS-I-TCP/IP" },
 								"rx ENQ while waiting EOT",
 							);
 							this.clearT2();
@@ -313,7 +313,7 @@ export abstract class Secs1Communicator extends AbstractSecsCommunicator {
 					const byte = this.buffer[0];
 					this.buffer = this.buffer.subarray(1);
 					if (byte === ACK) {
-						this.logger.detail.debug({ protocol: "SECS1" }, "rx ACK");
+						this.logger.detail.debug({ protocol: "SECS-I-TCP/IP" }, "rx ACK");
 						this.clearT2();
 						const currentBlock = this.currentBlocks[this.currentBlockIndex];
 						if (currentBlock.eBit) {
@@ -326,7 +326,7 @@ export abstract class Secs1Communicator extends AbstractSecsCommunicator {
 							this.sendCurrentBlock();
 						}
 					} else if (byte === NAK) {
-						this.logger.detail.warn({ protocol: "SECS1" }, "rx NAK");
+						this.logger.detail.warn({ protocol: "SECS-I-TCP/IP" }, "rx NAK");
 						this.clearT2();
 						this.handleT2Timeout();
 					}
@@ -366,7 +366,7 @@ export abstract class Secs1Communicator extends AbstractSecsCommunicator {
 							if (block.blockNumber !== this.expectedBlockNum) {
 								this.logger.detail.warn(
 									{
-										protocol: "SECS1",
+										protocol: "SECS-I-TCP/IP",
 										expected: this.expectedBlockNum,
 										got: block.blockNumber,
 									},
@@ -398,7 +398,7 @@ export abstract class Secs1Communicator extends AbstractSecsCommunicator {
 							}
 						} else {
 							this.logger.detail.warn(
-								{ protocol: "SECS1" },
+								{ protocol: "SECS-I-TCP/IP" },
 								"invalid checksum",
 							);
 							this.sendByte(NAK);
@@ -421,7 +421,7 @@ export abstract class Secs1Communicator extends AbstractSecsCommunicator {
 		const stream = this.stream;
 		const block = this.currentBlocks[this.currentBlockIndex];
 		if (stream && !stream.destroyed) {
-			this.logger.logBytes("Sent", "SECS1", block.buffer, {
+			this.logger.logBytes("Sent", "SECS-I-TCP/IP", block.buffer, {
 				blockNumber: block.blockNumber,
 				eBit: block.eBit,
 				systemBytes: block.systemBytes,

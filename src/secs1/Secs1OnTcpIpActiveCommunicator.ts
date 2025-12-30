@@ -26,7 +26,7 @@ export class Secs1OnTcpIpActiveCommunicator extends Secs1Communicator {
 			if (!this.shouldStop) {
 				this.logger.detail.warn(
 					{
-						protocol: "SECS1",
+						protocol: "SECS-I-TCP/IP",
 						ip: this.ip,
 						port: this.port,
 						timeoutT5: this.timeoutT5,
@@ -63,7 +63,7 @@ export class Secs1OnTcpIpActiveCommunicator extends Secs1Communicator {
 			socket.destroy();
 			this.logger.detail.warn(
 				{
-					protocol: "SECS1",
+					protocol: "SECS-I-TCP/IP",
 					ip: this.ip,
 					port: this.port,
 					timeoutT5: this.timeoutT5,
