@@ -262,7 +262,12 @@ export abstract class HsmsCommunicator extends AbstractSecsCommunicator<HsmsComm
 
 		// Handle Data Messages
 		if (this.state !== HsmsState.Selected) {
-			this.logger.logSecs2("Received", msg.toSml());
+			this.logger.logSecs2(
+				"Received",
+				msg.toSml(),
+				this.deviceId,
+				msg.systemBytes,
+			);
 			void this.sendReject(msg, RejectReason.NotSelected);
 			return;
 		}

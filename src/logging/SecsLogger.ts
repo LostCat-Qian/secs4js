@@ -399,6 +399,8 @@ class Secs2LineTransformStream extends Writable {
 		const timeValue = rec.time;
 		const dirValue = rec.dir;
 		const smlValue = rec.sml;
+		const deviceIdValue = rec.deviceId;
+		const systemBytesValue = rec.systemBytes;
 
 		const dir =
 			dirValue === "Sent" || dirValue === "Received" ? dirValue : null;
@@ -414,7 +416,11 @@ class Secs2LineTransformStream extends Writable {
 			date = new Date();
 		}
 
-		const out = `${formatDateTime(date)} ${dir} \n${normalizeSmlForSingleLine(sml)}\n`;
+		const deviceId = typeof deviceIdValue === "number" ? deviceIdValue : 0;
+		const systemBytes =
+			typeof systemBytesValue === "number" ? systemBytesValue : 0;
+
+		const out = `${formatDateTime(date)} ${dir} DeviceID: ${deviceId} SystemBytes: ${systemBytes} \n${normalizeSmlForSingleLine(sml)}\n`;
 		this.target.write(out);
 	}
 }
@@ -560,9 +566,19 @@ export class SecsLogger {
 		this.maxHexBytes = params.config.maxHexBytes ?? 64 * 1024;
 	}
 
-	logSecs2(direction: SecsLogDirection, sml: string): void {
+	logSecs2(
+		direction: SecsLogDirection,
+		sml: string,
+		deviceId: number,
+		systemBytes: number,
+	): void {
 		this.secs2.info(
-			{ dir: direction, sml: normalizeSmlForSingleLine(sml) },
+			{
+				dir: direction,
+				sml: normalizeSmlForSingleLine(sml),
+				deviceId,
+				systemBytes,
+			},
 			"",
 		);
 	}

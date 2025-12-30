@@ -35,7 +35,7 @@ async function main() {
 
 	const active = new HsmsActiveCommunicator({
 		ip: "127.0.0.1",
-		port: 5000,
+		port: 5001,
 		deviceId: 10,
 		isEquip: false,
 		log: {

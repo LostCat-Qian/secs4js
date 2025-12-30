@@ -138,7 +138,7 @@ export abstract class AbstractSecsCommunicator<
 		const systemBytes = this.getNextSystemBytes();
 		const msg = this.createMessage(stream, func, wBit, body, systemBytes);
 		const sml = msg.toSml();
-		this.logger.logSecs2("Sent", sml);
+		this.logger.logSecs2("Sent", sml, this.deviceId, systemBytes);
 		this.logger.detail.debug(
 			{
 				protocol: "SECS",
@@ -213,7 +213,7 @@ export abstract class AbstractSecsCommunicator<
 			primaryMsg.systemBytes,
 		);
 		const sml = msg.toSml();
-		this.logger.logSecs2("Sent", sml);
+		this.logger.logSecs2("Sent", sml, this.deviceId, primaryMsg.systemBytes);
 		this.logger.detail.debug(
 			{
 				protocol: "SECS",
@@ -241,7 +241,8 @@ export abstract class AbstractSecsCommunicator<
 
 	protected handleMessage(msg: SecsMessage) {
 		const sml = msg.toSml();
-		this.logger.logSecs2("Received", sml);
+		this.logger.logSecs2("Received", sml, this.deviceId, msg.systemBytes);
+
 		this.logger.detail.debug(
 			{
 				protocol: "SECS",
