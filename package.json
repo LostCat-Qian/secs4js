@@ -1,6 +1,6 @@
 {
 	"name": "secs4js",
-	"version": "0.4.5",
+	"version": "0.4.6",
 	"description": "A simple, efficient, and user-friendly SECS/GEM protocol library implemented in TypeScript.",
 	"repository": {
 		"type": "git",

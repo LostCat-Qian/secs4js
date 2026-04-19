@@ -44,7 +44,19 @@ class SmlCursor {
 	 * @description Skips whitespace characters in the string.
 	 */
 	skipWs() {
-		while (!this.eof() && /\s/.test(this.peek())) this.pos++;
+		while (!this.eof()) {
+			while (!this.eof() && /\s/.test(this.peek())) this.pos++;
+			if (this.str.startsWith("//", this.pos)) {
+				this.pos += 2;
+				while (!this.eof() && this.peek() !== "\n" && this.peek() !== "\r") {
+					this.pos++;
+				}
+				if (this.peek() === "\r") this.pos++;
+				if (this.peek() === "\n") this.pos++;
+				continue;
+			}
+			break;
+		}
 	}
 
 	/**
@@ -74,6 +86,12 @@ export class SmlParser {
 	 */
 	static parse(sml: string): SecsMessage {
 		const trimmed = sml.trim();
+		if (!trimmed.endsWith(".")) {
+			throw new Error("Invalid SML format: SML must end with '.'");
+		}
+		if (!/^[Ss]\d+[Ff]\d+/.test(trimmed)) {
+			throw new Error("Invalid SML format: SML must start with 'SxFy'");
+		}
 		const match = this.SML_REGEX.exec(trimmed);
 
 		if (!match) {
@@ -146,12 +164,17 @@ export class SmlParser {
 		} else if (typeStr === "A") {
 			cursor.skipWs();
 			// Expect quoted string
-			if (cursor.peek() === '"') {
-				cursor.consume();
+			if (cursor.peek() === '"' || cursor.peek() === "'") {
+				const quote = cursor.consume();
 				const start = cursor.pos;
-				while (!cursor.eof() && cursor.peek() !== '"') cursor.consume(); // Handle escaping? SML usually simple.
+				while (!cursor.eof() && cursor.peek() !== quote) cursor.consume();
+				if (cursor.eof()) {
+					throw new Error(
+						`Unterminated string value for type A at ${start.toString()}`,
+					);
+				}
 				const val = cursor.str.substring(start, cursor.pos);
-				cursor.consume(); // quote
+				cursor.consume();
 				item = new Secs2ItemAscii(val);
 			} else {
 				// Empty string or unquoted? Standard says quoted.
@@ -176,18 +199,22 @@ export class SmlParser {
 					cursor.consume();
 					break;
 				}
-				// Read byte
-				// Handle 0x prefix
 				if (
 					cursor.str.startsWith("0x", cursor.pos) ||
 					cursor.str.startsWith("0X", cursor.pos)
 				) {
 					cursor.pos += 2;
 				}
-				const byteStr = cursor.str.substring(cursor.pos, cursor.pos + 2);
-				const byteVal = parseInt(byteStr, 16);
-				if (isNaN(byteVal))
+				if (cursor.pos + 2 > cursor.str.length) {
 					throw new Error(`Invalid binary byte at ${cursor.pos.toString()}`);
+				}
+				const b0 = cursor.str[cursor.pos];
+				const b1 = cursor.str[cursor.pos + 1];
+				if (!/[0-9a-f]/i.test(b0) || !/[0-9a-f]/i.test(b1)) {
+					throw new Error(`Invalid binary byte at ${cursor.pos.toString()}`);
+				}
+				const byteStr = b0 + b1;
+				const byteVal = parseInt(byteStr, 16);
 				buffer.push(byteVal);
 				cursor.pos += 2;
 			}
