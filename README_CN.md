@@ -10,6 +10,8 @@
 
 Secs4js是一个简单、高效、用户友好的SECS/GEM协议库，使用TypeScript实现。它提供了一种与SECS/GEM设备通信的简单方式，使您能够轻松地使用SECS/GEM协议读写数据。
 
+我基于README文件创建了一个可供AI使用的SKILL.md文件，在根目录下，如果您有需要可以进行使用，正常配置好您的SKILLs即可。
+
 ## 支持的功能
 
 - SECS-I (SEMI-E4)

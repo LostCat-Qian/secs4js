@@ -10,6 +10,8 @@ A special thanks to the author **kenta-shimizu** for their open-source contribut
 
 Secs4js is a simple, efficient, and user-friendly SECS/GEM protocol library implemented in TypeScript. It provides a straightforward way to communicate with SECS/GEM devices, enabling you to easily read and write data using the SECS/GEM protocol.
 
+I created a SKILL.md file that can be used by AI based on the README file. It is located in the root directory. If you need it, you can use it. Just configure your SKILLs properly.
+
 ## Supported Features
 
 - SECS-I (SEMI-E4)
