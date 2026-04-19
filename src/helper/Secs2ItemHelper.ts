@@ -29,20 +29,8 @@ export function A(value: string): Secs2ItemAscii {
  * @param value The value of the item.
  * @returns The SECS-II boolean item.
  */
-export function BOOLEAN(value: string): Secs2ItemBoolean {
-	const booleanValues: boolean[] = [];
-	const values = value.split("");
-	values.map((v) => {
-		if (v !== "TRUE" && v !== "FALSE") {
-			throw new Error("BOOLEAN value must be TRUE or FALSE");
-		}
-		if (v === "TRUE") {
-			booleanValues.push(true);
-		} else {
-			booleanValues.push(false);
-		}
-	});
-	return Secs2ItemFactory.createBooleanItem(...booleanValues);
+export function BOOLEAN(...value: boolean[]): Secs2ItemBoolean {
+	return Secs2ItemFactory.createBooleanItem(...value);
 }
 
 /**
@@ -157,9 +145,6 @@ export function I8(...value: number[] | bigint[]): Secs2ItemNumeric {
  * @returns The SECS-II float 32-bit number item.
  */
 export function F4(...value: number[]): Secs2ItemNumeric {
-	if (value.some((v) => v % 1 !== 0)) {
-		throw new Error("F4 value must be float 32-bit number");
-	}
 	return Secs2ItemFactory.createF4Item(...value);
 }
 

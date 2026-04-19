@@ -1,10 +1,22 @@
 import {
 	A,
+	U1,
+	U2,
+	U4,
+	I1,
+	I2,
+	I4,
+	I8,
+	F4,
+	F8,
 	L,
+	SmlParser,
 	Secs2ItemAscii,
 	Secs2ItemList,
 	Secs2ItemNumeric,
-	SmlParser,
+	U8,
+	BOOLEAN,
+	Secs2ItemBoolean,
 } from "../src/index.js";
 
 function getItemValue() {
@@ -55,4 +67,41 @@ function getItemValue() {
 	console.log("NESTED ASCII value: ", nestedListFirstItem.value);
 }
 
+function newItemsTest() {
+	const newItems = L(
+		A("MDLN-A"),
+		A("SOFTREV-1"),
+		U1(20),
+		U2(1000, 2000),
+		U4(100000000, 200000000),
+		U8(1000000000000000, 2000000000000),
+		I1(10, 20),
+		I2(1000, -2000),
+		I4(100),
+		I8(-1234567890123456, 9973232131213124),
+		F4(3.14),
+		F8(1.234567890123456, 6.18),
+		BOOLEAN(true, false),
+	);
+
+	console.log((newItems[12] as Secs2ItemBoolean).value); // [true, false]
+	console.log(newItems.toSml());
+	// <L [13]
+	// 	<A [6] "MDLN-A">
+	// 	<A [9] "SOFTREV-1">
+	// 	<U1 [1] 20>
+	// 	<U2 [2] 1000 2000>
+	// 	<U4 [2] 100000000 200000000>
+	// 	<U8 [2] 1000000000000000 2000000000000>
+	// 	<I1 [2] 10 20>
+	// 	<I2 [2] 1000 -2000>
+	// 	<I4 [1] 100>
+	// 	<I8 [2] -1234567890123456 9973232131213124>
+	// 	<F4 [1] 3.14>
+	// 	<F8 [2] 1.234567890123456 6.18>
+	// 	<BOOLEAN T F>
+	// >
+}
+
+newItemsTest();
 getItemValue();
